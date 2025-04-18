@@ -58,9 +58,11 @@ function dropRock(sceneData, event) {
     rock.position.set(pos.x, pos.y, pos.z);
 
     if ((Math.abs(pos.x) < 8) & (Math.abs(pos.z) < 8)) {
-      scene.add(rock);
-      const key = `${pos.x},${pos.z}`;
-      rockPositions.add(key);
+      if (!(pos.x == 0 && pos.z == 0)) {
+        scene.add(rock);
+        const key = `${pos.x},${pos.z}`;
+        rockPositions.add(key);
+      }
     }
   }
 
@@ -78,16 +80,9 @@ function findRockPositions(sceneData, event) {
   if (Math.floor(Math.random() * 10) <= 4) {
     positions.push(userbasedPosition(sceneData, event));
   }
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  positions.push(randomPosition(sceneData));
-  
+  for (let iter = 0; iter <= 9; iter++) {
+    positions.push(randomPosition(sceneData));
+  }
   return positions;
 }
 
