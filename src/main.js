@@ -6,7 +6,7 @@ import { setupTurnSystem, gameCheck } from "./turnSystem.js";
 // Main driving File
 
 // Paths to sprites
-const dungeonPath = "/Sprite_Sheets/ProjectUtumno_full.png";
+const dungeonPath = "./Sprite_Sheets/ProjectUtumno_full.png";
 const playerPath = "./Sprite_Sheets/beetles.PNG";
 
 // Setup
