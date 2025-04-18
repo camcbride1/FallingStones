@@ -1,14 +1,18 @@
 import * as THREE from "three";
 import { setMessage } from "./uiController.js";
+// Facilitates the turn system
 
 let currentTurn = "player";
 
+// Stores Rock Positions
 const rockPositions = new Set();
 
+// Main driver for turn system
 export function setupTurnSystem(sceneData, player, movePlayer) {
   const { scene, camera, renderer } = sceneData;
   let awaitingInput = true;
 
+  // Handles input
   function handleKey(event) {
     if (currentTurn === "player" && awaitingInput) {
       if (
@@ -18,10 +22,11 @@ export function setupTurnSystem(sceneData, player, movePlayer) {
 
         if (move) {
           awaitingInput = false;
+          // Sets up rock drop
           setTimeout(() => {
             dropRock(sceneData, event);
             awaitingInput = true;
-          }, 250);
+          }, 100);
 
           currentTurn = "ai";
         }
@@ -36,6 +41,7 @@ export function setupTurnSystem(sceneData, player, movePlayer) {
   };
 }
 
+// Adds rocks based on positions recieved
 function dropRock(sceneData, event) {
   const { scene } = sceneData;
   const positions = findRockPositions(sceneData, event);
@@ -62,10 +68,13 @@ function dropRock(sceneData, event) {
   currentTurn = "player";
 }
 
+// Finds all rock positions and pushes them to the set
 function findRockPositions(sceneData, event) {
   const { scene, camera, renderer } = sceneData;
   let positions = [];
 
+  // Each rock has a chance not to spawn.
+  // One is made to pop in front of the player the other are random
   if (Math.floor(Math.random() * 10) <= 4) {
     positions.push(userbasedPosition(sceneData, event));
   }
@@ -82,6 +91,7 @@ function findRockPositions(sceneData, event) {
   return positions;
 }
 
+// Returns the position for the rock in front of player
 function userbasedPosition(sceneData, event) {
   const player = sceneData.scene.getObjectByName("player");
   const playerPos = player.position;
@@ -105,13 +115,14 @@ function userbasedPosition(sceneData, event) {
       break;
   }
 
-  return { x, y: 0.05, z }; // Slightly above ground
+  return { x, y: 0.05, z };
 }
 
+// Returns a random position on board
 function randomPosition(sceneData) {
   const chance = Math.floor(Math.random() * 10);
   if (chance < 2) return { x: 0, y: -5, z: 0 };
-  const gridRange = 7; // Limits to -7 to +7
+  const gridRange = 7;
   const maxTries = 5;
 
   const player = sceneData.scene.getObjectByName("player");
@@ -130,6 +141,7 @@ function randomPosition(sceneData) {
   return { x: 0, y: -5, z: 0 };
 }
 
+// Checks if the game is finished
 export function gameCheck(sceneData) {
   const player = sceneData.scene.getObjectByName("player");
   if (Math.abs(player.position.x) > 7 || Math.abs(player.position.z) > 7) {

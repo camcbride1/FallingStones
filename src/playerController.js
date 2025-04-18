@@ -3,15 +3,16 @@ import { setMessage } from "./uiController.js";
 
 // Player sprites from https://opengameart.org/content/lpc-beetle
 
+// Sets up player information
+// Sprites are currently broken, will fix before final release.
 export function scenePlayerSetup(sceneData, playerPath) {
     const scene = sceneData.scene;
 
-    // These values depend on your actual sprite sheet
     const textureWidth = 244;
     const textureHeight = 196;
     const frameCols = 5;
     const frameRows = 4;
-    const padding = 1; // Assume 1px padding between frames
+    const padding = 1;
 
     const frameIndexX = 1;
     const frameIndexY = 1;
@@ -32,10 +33,10 @@ export function scenePlayerSetup(sceneData, playerPath) {
 
     // Manually set the UVs
     const uvs = geometry.attributes.uv.array;
-    uvs[0] = u0; uvs[1] = v1;  // bottom left
-    uvs[2] = u1; uvs[3] = v1;  // bottom right
-    uvs[4] = u0; uvs[5] = v0;  // top left
-    uvs[6] = u1; uvs[7] = v0;  // top right
+    uvs[0] = u0; uvs[1] = v1;
+    uvs[2] = u1; uvs[3] = v1;
+    uvs[4] = u0; uvs[5] = v0;  
+    uvs[6] = u1; uvs[7] = v0;  
     geometry.attributes.uv.needsUpdate = true;
 
     const material = new THREE.MeshBasicMaterial({
@@ -53,7 +54,7 @@ export function scenePlayerSetup(sceneData, playerPath) {
     return player;
 }
 
-// Utility function to move player by one tile
+// Function to move player by one tile
 export function movePlayer(player, direction, rockPositions, tileSize = 1) {
     // Calculate intended move
     let targetX = player.position.x;
@@ -81,8 +82,9 @@ export function movePlayer(player, direction, rockPositions, tileSize = 1) {
     if (rockPositions.has(targetKey)) {
       console.log("Blocked by rock at", targetKey);
       setMessage("Blocked!");
-      return; // Don't move
+      return; 
     }
+    // Block movement if that is the edge
     if (Math.abs(targetX) > 8 || Math.abs(targetZ) > 8){
         console.log("You are at the edge!")
         return

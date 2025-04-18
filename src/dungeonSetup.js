@@ -2,17 +2,19 @@ import * as THREE from 'three';
 
 // Sprites from: https://opengameart.org/content/dungeon-crawl-32x32-tiles-supplemental
 
+// Main setup function
+// Sets up ground tiles
 export function sceneDungeonSetup(sceneData, tilesetPath, options = {}) {
     let scene = sceneData.scene;
     let camera = sceneData.camera;
     let renderer = sceneData.renderer;
 
     const {
-        rows = 15,         // Test with fewer rows for visibility
-        cols = 15,         // Fewer columns
-        tileSize = 1,     // Larger tile size
-        tilesHoriz = 64,   // Adjust based on your sprite sheet
-        tilesVert = 95,
+        rows = 15,         // Rows
+        cols = 15,         // Columns
+        tileSize = 1,      // Tile size
+        tilesHoriz = 64,   // Sprite Sheet info
+        tilesVert = 95,    // Sprite Sheet info
     } = options;
 
     const loader = new THREE.TextureLoader();

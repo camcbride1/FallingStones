@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+// Sets up scene, camera, renderer, reset button, and lights
 
+// Main scene setup
 export function sceneSetup(){
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050505);
@@ -22,6 +24,7 @@ export function sceneSetup(){
     }
 
     createLights(sceneData);
+    // Button Setup
     document.getElementById("resetButton").addEventListener("click", () => {
         window.location.reload(); 
       });
@@ -29,6 +32,7 @@ export function sceneSetup(){
     return sceneData
 }
 
+// Sets up lighting
 function createLights(sceneData){
     let scene = sceneData.scene;
     let camera = sceneData.camera;
