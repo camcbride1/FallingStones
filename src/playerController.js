@@ -1,98 +1,108 @@
 import * as THREE from 'three';
-import { setMessage } from "./uiController.js";
+import { setMessage } from './uiController.js';
 
-// Player sprites from https://opengameart.org/content/lpc-beetle
+// === Sprite Sheet Configuration ===
+// Adjust these values to match your new sprite sheet.
+const SPRITE_SHEET_CONFIG = {
+  width: 64,
+  height: 51,
+  cols: 4,        // Number of columns in the sprite sheet
+  rows: 3,        // Number of rows
+  padding: 1,     // Optional padding between frames
+  initialFrame: { x: 0, y: 0 }, // Starting frame (can be used for animation)
+};
 
-// Sets up player information
-// Sprites are currently broken, will fix before final release.
-export function scenePlayerSetup(sceneData, playerPath) {
-    const scene = sceneData.scene;
+// === Creates the Player Mesh ===
+function createPlayerMesh(texturePath, config = SPRITE_SHEET_CONFIG) {
+  const { cols, rows, initialFrame: { x: frameX, y: frameY } } = config;
 
-    const textureWidth = 244;
-    const textureHeight = 196;
-    const frameCols = 5;
-    const frameRows = 4;
-    const padding = 1;
+  const texture = new THREE.TextureLoader().load(texturePath);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
 
-    const frameIndexX = 1;
-    const frameIndexY = 1;
+  // 👇 Show only one frame (e.g., top-left)
+  texture.repeat.set(1 / cols, 1 / rows);
+  texture.offset.set(
+    frameX / cols,
+    1 - (frameY + 1) / rows
+  );
 
-    const frameWidth = Math.floor(textureWidth / frameCols);
-    const frameHeight = Math.floor(textureHeight / frameRows);
+  const aspectRatio = (1 / rows) / (1 / cols); // Width to height ratio per frame
+  const geometry = new THREE.PlaneGeometry(1, aspectRatio);
 
-    const u0 = (frameIndexX * frameWidth + padding) / textureWidth;
-    const v0 = 1 - ((frameIndexY + 1) * frameHeight - padding) / textureHeight;
-    const u1 = ((frameIndexX + 1) * frameWidth - padding) / textureWidth;
-    const v1 = 1 - (frameIndexY * frameHeight + padding) / textureHeight;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.1,
+  });
 
-    const texture = new THREE.TextureLoader().load(playerPath);
-    texture.magFilter = THREE.NearestFilter;
-    texture.minFilter = THREE.NearestFilter;
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(0, 0.01, 0);
+  mesh.name = 'player';
 
-    const geometry = new THREE.PlaneGeometry(1, frameHeight / frameWidth);
-
-    // Manually set the UVs
-    const uvs = geometry.attributes.uv.array;
-    uvs[0] = u0; uvs[1] = v1;
-    uvs[2] = u1; uvs[3] = v1;
-    uvs[4] = u0; uvs[5] = v0;  
-    uvs[6] = u1; uvs[7] = v0;  
-    geometry.attributes.uv.needsUpdate = true;
-
-    const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        alphaTest: 0.1,
-    });
-
-    const player = new THREE.Mesh(geometry, material);
-    player.position.set(0, 0.01, 0);
-    player.rotation.x = -Math.PI / 2;
-    player.name = "player";
-
-    scene.add(player);
-    return player;
+  return mesh;
 }
 
-// Function to move player by one tile
+// === Add Player to Scene ===
+export function scenePlayerSetup(sceneData, spritePath) {
+  const scene = sceneData.scene;
+  const player = createPlayerMesh(spritePath);
+  scene.add(player);
+  return player;
+}
+
+// === Move Player One Tile Based on Input ===
 export function movePlayer(player, direction, rockPositions, tileSize = 1) {
-    // Calculate intended move
-    let targetX = player.position.x;
-    let targetZ = player.position.z;
-  
-    switch (direction) {
-      case 'ArrowUp':
-        targetZ -= tileSize;
-        break;
-      case 'ArrowDown':
-        targetZ += tileSize;
-        break;
-      case 'ArrowLeft':
-        targetX -= tileSize;
-        break;
-      case 'ArrowRight':
-        targetX += tileSize;
-        break;
-    }
-  
-    // Convert position to a string key
-    const targetKey = `${targetX},${targetZ}`;
-  
-    // Block movement if there's a rock
-    if (rockPositions.has(targetKey)) {
-      console.log("Blocked by rock at", targetKey);
-      setMessage("Blocked!");
-      return; 
-    }
-    // Block movement if that is the edge
-    if (Math.abs(targetX) > 8 || Math.abs(targetZ) > 8){
-        console.log("You are at the edge!")
-        return
-    }
-  
-    // Move player
-    player.position.x = targetX;
-    player.position.z = targetZ;
-    setMessage("Looking Good!");
-    return true;
+  const pos = player.position;
+  let [targetX, targetZ] = [pos.x, pos.z];
+  let frameCol = 0; 
+  let frameRow = Math.floor(Math.random() * SPRITE_SHEET_CONFIG.rows); 
+
+  switch (direction) {
+    case 'ArrowUp':
+      targetZ -= tileSize;
+      frameCol = 2; // hypothetical row for up
+      break;
+    case 'ArrowDown':
+      targetZ += tileSize;
+      frameCol = 0;
+      break;
+    case 'ArrowLeft':
+      targetX -= tileSize;
+      frameCol = 3;
+      break;
+    case 'ArrowRight':
+      targetX += tileSize;
+      frameCol = 1;
+      break;
+    default: return;
   }
+
+  const key = `${targetX},${targetZ}`;
+
+  if (rockPositions.has(key)) {
+    console.log("Blocked by rock at", key);
+    setMessage("Blocked!");
+    return;
+  }
+
+  if (Math.abs(targetX) > 8 || Math.abs(targetZ) > 8) {
+    console.log("You are at the edge!");
+    return;
+  }
+
+  player.position.set(targetX, pos.y, targetZ);
+
+  setFrame(player.material.map, frameCol, frameRow, SPRITE_SHEET_CONFIG.cols, SPRITE_SHEET_CONFIG.rows);
+
+  setMessage("Looking Good!");
+  return true;
+}
+
+function setFrame(texture, col, row, cols, rows) {
+  texture.offset.set(
+    col / cols,
+    1 - (row + 1) / rows
+  );
+}

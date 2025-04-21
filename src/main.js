@@ -7,13 +7,14 @@ import { setupTurnSystem, gameCheck } from "./turnSystem.js";
 
 // Paths to sprites
 const dungeonPath = "./Sprite_Sheets/ProjectUtumno_full.png";
-const playerPath = "./Sprite_Sheets/beetles.PNG";
+const playerPath = "./Sprite_Sheets/character.png";
+const grassPath = "./Sprite_Sheets/grass.png";
 
 // Setup
-let sceneData = sceneSetup();
+let sceneData = sceneSetup(grassPath);
 sceneDungeonSetup(sceneData, dungeonPath);
 const player = scenePlayerSetup(sceneData, playerPath);
-const cleanupTurns = setupTurnSystem(sceneData, player, movePlayer);
+const cleanupTurns = setupTurnSystem(sceneData, player, movePlayer, dungeonPath);
 
 // Animation | Game Loop
 animate(sceneData);

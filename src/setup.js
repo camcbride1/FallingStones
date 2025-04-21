@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 // Sets up scene, camera, renderer, reset button, and lights
+// Grass Photo: https://www.vecteezy.com/free-vector/grass-background
 
 // Main scene setup
-export function sceneSetup(){
+export function sceneSetup(grassPath){
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050505);
     
@@ -24,6 +25,7 @@ export function sceneSetup(){
     }
 
     createLights(sceneData);
+    loadImage(sceneData, grassPath);
     // Button Setup
     document.getElementById("resetButton").addEventListener("click", () => {
         window.location.reload(); 
@@ -45,4 +47,25 @@ function createLights(sceneData){
     
     const ambientLight = new THREE.AmbientLight(0xf0f0f0, .9);
     scene.add(ambientLight);
+}
+
+// Load and add a JPG image as a texture on a plane
+function loadImage(sceneData, path) {
+  const loader = new THREE.TextureLoader();
+  loader.load(path, function (texture) {
+      const geometry = new THREE.PlaneGeometry(25, 25); // Size of the plane
+      const material = new THREE.MeshBasicMaterial({ map: texture });
+      
+      const plane = new THREE.Mesh(geometry, material);
+      const plane2 = new THREE.Mesh(geometry, material);
+
+      plane.position.set(-10, -1, 2); // Position the plane
+      plane.rotation.x = -Math.PI / 2; // Rotate to face camera
+
+      plane2.position.set(10, -1, 2); // Position the plane
+      plane2.rotation.x = -Math.PI / 2; // Rotate to face camera
+
+      sceneData.scene.add(plane); // Add the plane to the scene
+      sceneData.scene.add(plane2); // Add the plane to the scene
+  });
 }

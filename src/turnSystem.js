@@ -8,7 +8,7 @@ let currentTurn = "player";
 const rockPositions = new Set();
 
 // Main driver for turn system
-export function setupTurnSystem(sceneData, player, movePlayer) {
+export function setupTurnSystem(sceneData, player, movePlayer, dungeonPath) {
   const { scene, camera, renderer } = sceneData;
   let awaitingInput = true;
 
@@ -24,7 +24,7 @@ export function setupTurnSystem(sceneData, player, movePlayer) {
           awaitingInput = false;
           // Sets up rock drop
           setTimeout(() => {
-            dropRock(sceneData, event);
+            dropRock(sceneData, event, dungeonPath);
             awaitingInput = true;
           }, 100);
 
@@ -42,27 +42,47 @@ export function setupTurnSystem(sceneData, player, movePlayer) {
 }
 
 // Adds rocks based on positions recieved
-function dropRock(sceneData, event) {
+function dropRock(sceneData, event, dungeonPath) {
+  const tilesHoriz = 64; // Number of columns in the sprite sheet
+  const tilesVert = 95;  // Number of rows
+  const loader = new THREE.TextureLoader();
+  const rockTexture = loader.load(dungeonPath);
+  rockTexture.wrapS = THREE.RepeatWrapping;
+  rockTexture.wrapT = THREE.RepeatWrapping;
+  rockTexture.repeat.set(1 / tilesHoriz, 1 / tilesVert);
   const { scene } = sceneData;
   const positions = findRockPositions(sceneData, event);
-  const geometry = new THREE.CircleGeometry(0.5, 32);
-  const material = new THREE.MeshBasicMaterial({
-    color: 0x4f4f4f,
-    side: THREE.DoubleSide,
-  });
+
 
   for (const pos of positions) {
-    const rock = new THREE.Mesh(geometry, material);
+    // Clone the shared texture so each rock can have a unique offset
+    const tileTexture = rockTexture.clone();
+    tileTexture.needsUpdate = true;
+
+    // Pick a tile from a known rock sprite range (adjust as needed)
+    const tileIndexX = Math.floor(Math.random() * 24) + 28; // e.g. X tiles 20–29
+    const tileIndexY = 12; // Row where rocks live (adjust to your sheet layout)
+
+    tileTexture.offset.x = tileIndexX / tilesHoriz;
+    tileTexture.offset.y = 1 - (tileIndexY + 1) / tilesVert;
+
+    const rockMaterial = new THREE.MeshBasicMaterial({
+      map: tileTexture,
+      transparent: true,
+      alphaTest: 0.1,
+      side: THREE.DoubleSide,
+    });
+
+    const rockGeometry = new THREE.PlaneGeometry(1, 1);
+    const rock = new THREE.Mesh(rockGeometry, rockMaterial);
     rock.name = "rock";
     rock.rotation.x = -Math.PI / 2;
     rock.position.set(pos.x, pos.y, pos.z);
 
-    if ((Math.abs(pos.x) < 8) & (Math.abs(pos.z) < 8)) {
-      if (!(pos.x == 0 && pos.z == 0)) {
-        scene.add(rock);
-        const key = `${pos.x},${pos.z}`;
-        rockPositions.add(key);
-      }
+    const key = `${pos.x},${pos.z}`;
+    if ((Math.abs(pos.x) < 8) && (Math.abs(pos.z) < 8) && !(pos.x === 0 && pos.z === 0)) {
+      scene.add(rock);
+      rockPositions.add(key);
     }
   }
 
@@ -80,7 +100,7 @@ function findRockPositions(sceneData, event) {
   if (Math.floor(Math.random() * 10) <= 4) {
     positions.push(userbasedPosition(sceneData, event));
   }
-  for (let iter = 0; iter <= 9; iter++) {
+  for (let iter = 0; iter <= 7; iter++) {
     positions.push(randomPosition(sceneData));
   }
   return positions;
