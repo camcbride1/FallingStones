@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { setMessage } from './uiController.js';
 
-// === Sprite Sheet Configuration ===
 // Adjust these values to match your new sprite sheet.
 const SPRITE_SHEET_CONFIG = {
   width: 64,
