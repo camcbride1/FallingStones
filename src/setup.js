@@ -59,13 +59,13 @@ function loadImage(sceneData, path) {
       const plane = new THREE.Mesh(geometry, material);
       const plane2 = new THREE.Mesh(geometry, material);
 
-      plane.position.set(-10, -1, 2); // Position the plane
-      plane.rotation.x = -Math.PI / 2; // Rotate to face camera
+      plane.position.set(-10, -1, 2);
+      plane.rotation.x = -Math.PI / 2;
 
-      plane2.position.set(10, -1, 2); // Position the plane
-      plane2.rotation.x = -Math.PI / 2; // Rotate to face camera
+      plane2.position.set(10, -1, 2);
+      plane2.rotation.x = -Math.PI / 2;
 
-      sceneData.scene.add(plane); // Add the plane to the scene
-      sceneData.scene.add(plane2); // Add the plane to the scene
+      sceneData.scene.add(plane);
+      sceneData.scene.add(plane2);
   });
 }

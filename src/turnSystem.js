@@ -55,13 +55,11 @@ function dropRock(sceneData, event, dungeonPath) {
 
 
   for (const pos of positions) {
-    // Clone the shared texture so each rock can have a unique offset
     const tileTexture = rockTexture.clone();
     tileTexture.needsUpdate = true;
 
-    // Pick a tile from a known rock sprite range (adjust as needed)
-    const tileIndexX = Math.floor(Math.random() * 24) + 28; // e.g. X tiles 20–29
-    const tileIndexY = 12; // Row where rocks live (adjust to your sheet layout)
+    const tileIndexX = Math.floor(Math.random() * 24) + 28;
+    const tileIndexY = 12;
 
     tileTexture.offset.x = tileIndexX / tilesHoriz;
     tileTexture.offset.y = 1 - (tileIndexY + 1) / tilesVert;

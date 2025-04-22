@@ -12,7 +12,7 @@ const SPRITE_SHEET_CONFIG = {
   initialFrame: { x: 0, y: 0 }, // Starting frame (can be used for animation)
 };
 
-// === Creates the Player Mesh ===
+// Creates the Player
 function createPlayerMesh(texturePath, config = SPRITE_SHEET_CONFIG) {
   const { cols, rows, initialFrame: { x: frameX, y: frameY } } = config;
 
@@ -20,14 +20,14 @@ function createPlayerMesh(texturePath, config = SPRITE_SHEET_CONFIG) {
   texture.magFilter = THREE.NearestFilter;
   texture.minFilter = THREE.NearestFilter;
 
-  // 👇 Show only one frame (e.g., top-left)
+  // Show only one frame
   texture.repeat.set(1 / cols, 1 / rows);
   texture.offset.set(
     frameX / cols,
     1 - (frameY + 1) / rows
   );
 
-  const aspectRatio = (1 / rows) / (1 / cols); // Width to height ratio per frame
+  const aspectRatio = (1 / rows) / (1 / cols);
   const geometry = new THREE.PlaneGeometry(1, aspectRatio);
 
   const material = new THREE.MeshBasicMaterial({
@@ -44,7 +44,7 @@ function createPlayerMesh(texturePath, config = SPRITE_SHEET_CONFIG) {
   return mesh;
 }
 
-// === Add Player to Scene ===
+// Add Player to Scene
 export function scenePlayerSetup(sceneData, spritePath) {
   const scene = sceneData.scene;
   const player = createPlayerMesh(spritePath);
@@ -52,7 +52,7 @@ export function scenePlayerSetup(sceneData, spritePath) {
   return player;
 }
 
-// === Move Player One Tile Based on Input ===
+// Move Player One Tile Based on Input
 export function movePlayer(player, direction, rockPositions, tileSize = 1) {
   const pos = player.position;
   let [targetX, targetZ] = [pos.x, pos.z];
@@ -62,7 +62,7 @@ export function movePlayer(player, direction, rockPositions, tileSize = 1) {
   switch (direction) {
     case 'ArrowUp':
       targetZ -= tileSize;
-      frameCol = 2; // hypothetical row for up
+      frameCol = 2;
       break;
     case 'ArrowDown':
       targetZ += tileSize;
@@ -100,6 +100,7 @@ export function movePlayer(player, direction, rockPositions, tileSize = 1) {
   return true;
 }
 
+// Sets sprite
 function setFrame(texture, col, row, cols, rows) {
   texture.offset.set(
     col / cols,
