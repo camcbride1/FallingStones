@@ -1,14 +1,13 @@
 import * as THREE from 'three';
 import { setMessage } from './uiController.js';
 
-// Adjust these values to match your new sprite sheet.
 const SPRITE_SHEET_CONFIG = {
   width: 64,
   height: 51,
   cols: 4,        // Number of columns in the sprite sheet
   rows: 3,        // Number of rows
-  padding: 1,     // Optional padding between frames
-  initialFrame: { x: 0, y: 0 }, // Starting frame (can be used for animation)
+  padding: 1,     // Padding between frames
+  initialFrame: { x: 0, y: 0 },
 };
 
 // Creates the Player
